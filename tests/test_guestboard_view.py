@@ -6,7 +6,8 @@ from django.core.paginator import Page
 class GuestboardViewTest(TestCase):
     def test_view_index_access_01(self):
         """Show Get Page view"""
-        response = self.client.get('guestboard/')
+        response = self.client.get('/guestboard/')
+        print("response : {}".format(response))
         self.assertTemplateUsed(response, 'guestboard/index.html')
 
     def test_view_get_page_01(self):
