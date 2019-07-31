@@ -35,7 +35,7 @@ def index(request):
             messages.error(request, '入力内容に誤りがあります。')
     page = _get_page(
         Posting.objects.order_by('-id'),
-        request.GET('page')
+        request.GET.get('page')
     )
     context = {
         'form': form,

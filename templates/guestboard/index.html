@@ -5,7 +5,7 @@
     <h1>Guest Board</h1>
 </div>
 {# 画面上段 入力フォームを定義する #}
-<form action="{{ url 'guestboard:index' }}" method="post">
+<form action="{% url 'guestboard:index' %}" method="post">
     <div class="row">
         {% for field in form %}
         <dlv class="form-group">
@@ -36,7 +36,7 @@
             {% for posting in page %}
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">{{ posting.title }} <label class="small">投稿日時：{{ posting.created_at }}</label></h3>
+                        <h3 class="panel-title">{{ posting.name }} <label class="small">投稿日時：{{ posting.created_at }}</label></h3>
                     </div>
                     <div class="panel-body">
                         {{ posting.message }}
