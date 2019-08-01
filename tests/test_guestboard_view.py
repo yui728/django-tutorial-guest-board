@@ -7,12 +7,22 @@ class GuestboardViewTest(TestCase):
     fixtures = ['posting_data']
 
     def __assert_posting_panel(self, panel, posting_data):
-        panel_head = panel.find('div.panel-heading')
-        print("panel_head = {}".format(panel_head))
-        self.assertEquals(posting_data["name"], panel_head.find('h3.panel-title').text)
-        self.assertEquals(posting_data["created_at"], panel_head.find('h3-panel-title label.small').text)
-        panel_body = panel.find('div.panel-body')
-        self.assertEquals(posting_data["message"], panel_body.text)
+        # print("panel-childrens={}".format(panel.getchildren()))
+        panel_head = panel.cssselect('div.panel-heading')
+        self.assertIsNotNone(panel_head)
+        self.assertNotEqual(0, len(panel_head))
+        # print("panel_head = {}".format(panel_head))
+        # print("panel-head={}".format(panel_head[0]))
+        panel_title = panel_head[0].cssselect('h3.panel-title')
+        self.assertIsNotNone(panel_title)
+        self.assertNotEquals(0, len(panel_title))
+        self.assertEquals(posting_data["name"], panel_title[0].text.rstrip())
+        created_at = panel_title[0].cssselect('label.small')
+        self.assertIsNotNone(created_at)
+        self.assertNotEquals(0, len(created_at))
+        self.assertTrue(posting_data["created_at"] in created_at[0].text)
+        panel_body = panel.cssselect('div.panel-body')
+        self.assertEquals(posting_data["message"], panel_body[0].text.strip())
  
     def test_view_index_access_01(self):
         """Show Get Page view"""
@@ -22,11 +32,52 @@ class GuestboardViewTest(TestCase):
         with self.assertHTML(response, 'div.panel') as panels:
             self.assertEquals(5, len(panels))
             posting_data = {
+                "name": "Tina",
+                "created_at": "2019年2月1日19:45",
+                "message": "Message 05"
+            }
+            self.__assert_posting_panel(panels[0], posting_data)
+
+            posting_data = {
+                "name": "Sam",
+                "created_at": "2019年1月10日15:10",
+                "message": "Message 04"
+            }
+            self.__assert_posting_panel(panels[1], posting_data)
+
+            posting_data = {
+                "name": "Hellen",
+                "created_at": "2019年1月2日5:25",
+                "message": "Message 03"
+            }
+            self.__assert_posting_panel(panels[2], posting_data)
+
+            posting_data = {
+                "name": "Mimi",
+                "created_at": "2019年1月1日11:30",
+                "message": "Message 02"
+            }
+            self.__assert_posting_panel(panels[3], posting_data)
+
+            posting_data = {
+                "name": "Paul",
+                "created_at": "2019年1月1日10:10",
+                "message": "Message 01"
+            }
+            self.__assert_posting_panel(panels[4], posting_data)
+
+    def test_view_index_access_02(self):
+        """Show Get Page view as set page-no."""
+        response = self.client.get('/guestboard/', {"page": 2})
+        # print("response : {}".format(response.context))
+        self.assertTemplateUsed(response, 'guestboard/index.html')
+        with self.assertHTML(response, 'div.panel') as panels:
+            self.assertEquals(1, len(panels))
+            posting_data = {
                 "name": "Alice",
-                "created_at": "2019年1月1日 10:00",
+                "created_at": "2019年1月1日10:00",
                 "message": "Hello!"
             }
-            print(panels[0])
             self.__assert_posting_panel(panels[0], posting_data)
 
     def test_view_get_page_01(self):
