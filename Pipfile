@@ -6,6 +6,8 @@ verify_ssl = true
 [dev-packages]
 pylint = "*"
 django-with-asserts = "*"
+selenium = "*"
+chromedriver-binary = "*"
 
 [packages]
 django = "*"
