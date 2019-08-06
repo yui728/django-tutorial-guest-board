@@ -6,9 +6,14 @@ from selenium.webdriver.common.keys import Keys
 import time
 import chromedriver_binary
 from selenium.webdriver.chrome.options import Options
+from guestboard.models import Posting
+from django.utils import dateformat
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class LiveChromeTest(StaticLiveServerTestCase):
     fixtures = ['posting_data']
+    SERVER_RESPONSE_WAIT_SEC = 10
 
     @classmethod
     def setUpClass(cls):
@@ -25,11 +30,14 @@ class LiveChromeTest(StaticLiveServerTestCase):
 
     def __assert_posting_panel(self, web_element: webelement.WebElement, posting_data: dict) -> None:
         title = web_element.find_element_by_css_selector('div.panel-heading > h3.panel-title')
-        self.assertTrue(posting_data['name'] in title.text)
+        if 'name' in posting_data.keys():
+            self.assertTrue(posting_data['name'] in title.text)
         created_at = web_element.find_element_by_css_selector('div.panel-heading > h3.panel-title > label.small')
-        self.assertTrue(posting_data['created_at'] in created_at.text)
+        if 'created_at' in posting_data.keys():
+            self.assertTrue(posting_data['created_at'] in created_at.text)
         message = web_element.find_element_by_css_selector('div.panel-body')
-        self.assertEqual(posting_data['message'], message.text.strip())
+        if 'messsage' in posting_data.keys():
+            self.assertEqual(posting_data['message'], message.text.strip())
 
 
     def test_guestboard_view_01(self):
@@ -45,12 +53,12 @@ class LiveChromeTest(StaticLiveServerTestCase):
         next_links = self.selenium.find_elements_by_css_selector('li.next')
         self.assertEquals(2, len(next_links))
         for next_link in next_links:
-            self.assertTrue(next_link.get_attribute('class') not in 'disabled')
+            self.assertTrue('disabled' not in next_link.get_attribute('class'))
         # Previousページリンクのチェック
         previous_links = self.selenium.find_elements_by_css_selector('li.previous')
         self.assertEquals(2, len(previous_links))
         for previous_link in previous_links:
-            self.assertTrue(previous_link.get_attribute('class') in 'disabled')
+            self.assertTrue('disabled' in previous_link.get_attribute('class'))
         # 投稿パネルの表示内容チェック
         postings = self.selenium.find_elements_by_css_selector('div.panel')
         self.assertEqual(5, len(postings))
@@ -97,7 +105,7 @@ class LiveChromeTest(StaticLiveServerTestCase):
         self.assertEqual(2, len(next_links))
         next_url = next_links[0].get_attribute('href')
         next_links[0].click()
-        time.sleep(10)
+        time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
         self.assertEquals(next_url, self.selenium.current_url)
 
     def test_guestboard_view_03(self):
@@ -107,7 +115,7 @@ class LiveChromeTest(StaticLiveServerTestCase):
         self.assertEqual(2, len(next_links))
         next_url = next_links[1].get_attribute('href')
         next_links[1].click()
-        time.sleep(10)
+        time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
         self.assertEquals(next_url, self.selenium.current_url)
 
     def test_guestboard_view_04(self):
@@ -117,7 +125,7 @@ class LiveChromeTest(StaticLiveServerTestCase):
         self.assertEqual(2, len(next_links))
         next_url = next_links[0].get_attribute('href')
         next_links[0].click()
-        time.sleep(10)
+        time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
         self.assertEquals(next_url, self.selenium.current_url)
 
     def test_guestboard_view_05(self):
@@ -127,5 +135,67 @@ class LiveChromeTest(StaticLiveServerTestCase):
         self.assertEqual(2, len(next_links))
         next_url = next_links[1].get_attribute('href')
         next_links[1].click()
-        time.sleep(10)
+        time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
         self.assertEquals(next_url, self.selenium.current_url)
+
+    def test_guestboard_view_06(self):
+        """Posting input error for name no input"""
+        self.selenium.get('%s%s' % (self.live_server_url, '/guestboard/'))
+        # input message
+        message = self.selenium.find_element_by_css_selector('textarea[name="message"]')
+        submit = self.selenium.find_element_by_css_selector('input[type="submit"]')
+        message.send_keys("Test Message 100")
+        message.send_keys(Keys.ENTER)
+        submit.click()
+        time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
+        # 名前を未入力でSubmitしようとすると、名前にフォーカスする
+        actived = self.selenium.switch_to_active_element()
+        self.assertEqual('input', actived.tag_name)
+        self.assertEqual('text', actived.get_attribute('type'))
+        self.assertEqual('name', actived.get_attribute('name'))
+
+    def test_guestboard_view_07(self):
+        """Posting input error for message no input"""
+        self.selenium.get('%s%s' % (self.live_server_url, '/guestboard/'))
+        # input name
+        name = self.selenium.find_element_by_css_selector('input[name="name"]')
+        submit = self.selenium.find_element_by_css_selector('input[type="submit"]')
+        name.send_keys("Arty")
+        name.send_keys(Keys.ENTER)
+        submit.click()
+        time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
+        # メッセージを未入力でSubmitしようとすると、メッセージにフォーカスする
+        actived = self.selenium.switch_to_active_element()
+        self.assertEqual('textarea', actived.tag_name)
+        self.assertEqual('message', actived.get_attribute('name'))
+
+    def test_guetstboard_view_08(self):
+        """Posting submit success and view registerd message"""
+        self.selenium.get('%s%s' % (self.live_server_url, '/guestboard/'))
+        # input name
+        name = self.selenium.find_element_by_css_selector('input[name="name"]')
+        name.send_keys("Arty")
+        # input message
+        message = self.selenium.find_element_by_css_selector('textarea[name="message"]')
+        message.send_keys("Test Message 100")
+        # click submit button
+        submit = self.selenium.find_element_by_css_selector('input[type="submit"]')
+        submit.click()
+        # time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
+        # リダイレクトチェック
+        wait = WebDriverWait(self.selenium, self.SERVER_RESPONSE_WAIT_SEC)
+        wait.until(EC.url_to_be('%s%s' % (self.live_server_url, '/guestboard/')))
+        # 投稿成功メッセージチェック
+        messages = self.selenium.find_elements_by_css_selector('ul.messages > li.success')
+        self.assertEqual(1, len(messages))
+        self.assertEqual('投稿を受け付けました。', messages[0].text.strip())
+        # 投稿パネルの表示内容チェック
+        postings = self.selenium.find_elements_by_css_selector('div.panel')
+        self.assertEqual(5, len(postings))
+        posting_data = {
+            "name": "Arty",
+            "message": "Test Message 100",
+        }
+        self.__assert_posting_panel(postings[0], posting_data)
+
+

@@ -8,6 +8,7 @@ from django.shortcuts import (
     render,
     redirect
 )
+from django.contrib import messages
 from .models import Posting
 from .forms import PostingForm
 
