@@ -4,8 +4,7 @@ import selenium.common.exceptions as selenium_exceptions
 from selenium.webdriver.remote import webelement
 from selenium.webdriver.common.keys import Keys
 import time
-import chromedriver_binary
-from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.safari. import Options
 from guestboard.models import Posting
 from django.utils import dateformat
 from selenium.webdriver.support.ui import WebDriverWait
@@ -18,9 +17,10 @@ class LiveChromeTest(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        options = Options()
-        options.add_argument('--headless')
-        cls.selenium = webdriver.Chrome(options=options)
+        # options = Options()
+        # options.add_argument('-headless')
+        # cls.selenium = webdriver.Safari(options=options)
+        cls.selenium = webdriver.Safari(quiet=True)
         cls.selenium.implicitly_wait(10)
 
     @classmethod
@@ -203,7 +203,7 @@ class LiveChromeTest(StaticLiveServerTestCase):
         submit.click()
         # time.sleep(self.SERVER_RESPONSE_WAIT_SEC)
         # リダイレクトチェック
-        wait = WebDriverWait(self.selenium, self.SERVER_RESPONSE_WAIT_SEC)
+        wait = WebDriverWait(self.selenium, 30)
         wait.until(EC.url_to_be('%s%s' % (self.live_server_url, '/guestboard/')))
         # 投稿成功メッセージチェック
         messages = self.selenium.find_elements_by_css_selector('ul.messages > li.success')
