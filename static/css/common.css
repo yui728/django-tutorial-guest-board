@@ -29,3 +29,7 @@
     color: #F00;
     background-color: #fdd;
 }
+
+input[type="text"], textarea {
+    color: black;
+}
