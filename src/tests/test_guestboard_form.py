@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from guestboard.forms import PostingForm
+from src.guestboard import PostingForm
 
 class PostingFormTest(SimpleTestCase):
     def test_form_success_01(self):

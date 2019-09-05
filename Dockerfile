@@ -1,15 +1,20 @@
 FROM django
 
-RUN ["mkdir", "/usr/bin/app/django-tutorial"]
-WORKDIR /usr/bin/myapps/django-tutorial
+RUN mkdir -p /opt/apps/django-tutorial-guest-board
+WORKDIR /opt/apps/django-tutorial-guest-board
 
-RUN pip install pipenv -y
-RUN pipenv install -y
+COPY ./src/requirements.txt ./
 
-CMD pipenv update
+CMD pip install --upgrade pip
 
-CMD python3 manage.py collectstatic
+CMD pip install -r requirements.txt
 
-CMD gunicorn config.wsgi
+CMD python3 manage.py collectstatic --clear
+
+CMD ["echo", "run gunicorn"]
+
+CMD ["echo", "gunicorn", "-v"]
+
+CMD ["gunicorn", "config.wsgi"]
 
 EXPOSE 8000

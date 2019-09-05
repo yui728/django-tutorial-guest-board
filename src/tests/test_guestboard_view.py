@@ -1,5 +1,5 @@
 from with_asserts.case import TestCase
-import guestboard.views as views
+from src import guestboard as views
 import string
 from django.core.paginator import Page
 

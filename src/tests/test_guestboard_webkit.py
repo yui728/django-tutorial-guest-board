@@ -4,9 +4,7 @@ import selenium.common.exceptions as selenium_exceptions
 from selenium.webdriver.remote import webelement
 from selenium.webdriver.common.keys import Keys
 import time
-from selenium.webdriver.firefox.options import Options
-from guestboard.models import Posting
-from django.utils import dateformat
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -18,8 +16,8 @@ class LiveChromeTest(StaticLiveServerTestCase):
     def setUpClass(cls):
         super().setUpClass()
         options = Options()
-        options.add_argument('-headless')
-        cls.selenium = webdriver.Firefox(firefox_options=options)
+        options.add_argument('--headless')
+        cls.selenium = webdriver.Chrome(options=options)
         cls.selenium.implicitly_wait(10)
 
     @classmethod

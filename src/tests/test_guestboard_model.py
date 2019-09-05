@@ -1,5 +1,5 @@
 from django.test import TestCase
-from guestboard.models import Posting
+from src.guestboard import Posting
 from django.db import utils
 
 class PostingModelTest(TestCase):

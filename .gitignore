@@ -54,7 +54,7 @@ coverage.xml
 # Django stuff:
 *.log
 local_settings.py
-db.sqlite3
+src/db.sqlite3
 
 # Flask stuff:
 instance/
@@ -104,4 +104,4 @@ venv.bak/
 .mypy_cache/
 
 # VSCode Files
-/.vscode
+/src/.vscode
