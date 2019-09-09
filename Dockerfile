@@ -1,15 +1,19 @@
-FROM django
+FROM python:3.7
 
-RUN mkdir -p /opt/apps/django-tutorial-guest-board
-WORKDIR /opt/apps/django-tutorial-guest-board
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends \
+	postgresql-client \
+	&& rm -rf /var/lib/apt/lists/*
 
-COPY ./src/requirements.txt ./
+WORKDIR /usr/src/app
+COPY ./src/requirements.txt .
+RUN pip install --upgrade pip && \
+  pip install -r requirements.txt
 
-CMD pip install --upgrade pip && \
-  pip install -r requirements.txt && \
-  python3 manage.py collectstatic --clear && \
+CMD python3 manage.py collectstatic --clear && \
   echo "run gunicorn" && \
-  echo gunicorn -v && \
-  gunicorn config.wsgi
+  echo "gunicorn -v:"  && \
+  gunicorn -v && \
+  gunicorn config.wsgi -b 0.0.0.0:8000
 
 EXPOSE 8000
