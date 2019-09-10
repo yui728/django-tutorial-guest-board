@@ -16,9 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
-from . import settings
+from . import base
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('guestboard/', include('guestboard.urls'))
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] + static(base.STATIC_URL, document_root=base.STATIC_ROOT)
