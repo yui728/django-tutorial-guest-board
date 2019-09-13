@@ -14,8 +14,8 @@ services:
       - type: bind
         source: ./src
         target: /usr/src/app
-      - "staticdata:/var/www/django-tutorial-guest-board/static/"
-    command: bash -c "python manage.py collectstatic --clear && gunicorn config.wsgi -b 0.0.0.0:8000"
+      - "staticdata:/var/www/app/static/"
+    command: bash -c "python manage.py collectstatic --clear --noinput && gunicorn config.wsgi -b 0.0.0.0:8000"
     container_name: server-django-tutorial-guest-board
 
   nginx:
