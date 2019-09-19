@@ -29,6 +29,7 @@ services:
     volumes:
       - "./docker/nginx/:/etc/nginx/"
       - "staticdata:/var/www/static/"
+      - "/var/log/nginx/:/var/log/django-tutorial-guest-board/"
     container_name: nginx-django-tutorial-guest-board
 
 volumes:
