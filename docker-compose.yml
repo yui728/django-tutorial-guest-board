@@ -15,7 +15,7 @@ services:
         source: ./src
         target: /usr/src/app
       - "staticdata:/var/www/app/static/"
-      - "/var/log/:/var/log/django-tutorial-guest-board/"
+      - "/var/log/django-tutorial-guest-board/:/var/log/"
     command: bash -c "python manage.py collectstatic --clear --noinput && gunicorn config.wsgi -b 0.0.0.0:8000"
     container_name: server-django-tutorial-guest-board
 
@@ -29,7 +29,7 @@ services:
     volumes:
       - "./docker/nginx/:/etc/nginx/"
       - "staticdata:/var/www/static/"
-      - "/var/log/nginx/:/var/log/django-tutorial-guest-board/"
+      - "/var/log/django-tutorial-guest-board/:/var/log/nginx/"
     container_name: nginx-django-tutorial-guest-board
 
 volumes:
